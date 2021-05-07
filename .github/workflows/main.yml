@@ -14,19 +14,24 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [15.x]
 
     steps:
       - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.3.0
+        with:
+          token: ${{ secrets.token || github.token }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install yarn
+        if: ${{ github.token || false }}
+        run: npm i -g yarn
 
       - run: yarn install
       - run: yarn build
-      
-      - name: yarn test
-        run: yarn test
+      - run: yarn test
         env:
           username: ${{ secrets.username }}
           password: ${{ secrets.password }}
-          
       - run: yarn lint
