@@ -2,7 +2,7 @@ name: Main Workflow
 
 on:
   schedule:
-    - cron: "* */1 * * *"
+    - cron: "0 */2 * * *"
   push:
     branches: [master]
   pull_request:
@@ -16,15 +16,17 @@ jobs:
       matrix:
         node-version: [14.x]
 
-    env:
-      username: ${{ secrets.username }}
-      password: ${{ secrets.password }}
-
     steps:
       - uses: actions/checkout@v2
       - uses: borales/actions-yarn@v2.3.0
 
       - run: yarn install
       - run: yarn build
-      - run: yarn test
+      
+      - name: yarn test
+        run: yarn test
+        env:
+          username: ${{ secrets.username }}
+          password: ${{ secrets.password }}
+          
       - run: yarn lint
