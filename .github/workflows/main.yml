@@ -32,6 +32,6 @@ jobs:
       - run: yarn build
       - run: yarn test
         env:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
       - run: yarn lint
