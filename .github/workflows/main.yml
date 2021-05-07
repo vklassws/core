@@ -30,8 +30,8 @@ jobs:
 
       - run: yarn install
       - run: yarn build
-      - run: yarn test
+      - run: yarn test --timeout 7000
         env:
-          username: ${{ secrets.username }}
-          password: ${{ secrets.password }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
       - run: yarn lint
