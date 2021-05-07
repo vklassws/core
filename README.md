@@ -2,6 +2,8 @@
 
 This package contains the accual web scraper and APIs. The package is not complete and will probaly never be. Much functionallity is not implemented yet. But _you_ can [contribute extenders](#contributing) to add functionallity ;)
 
+> **Note!** The core is likely to change drastically _with breaking changes_ before the v1 relase.
+
 ## Installation
 
 Make you you have [yarn](https://yarnpkg.com/) version 2 installed.
@@ -11,6 +13,21 @@ Make you you have [yarn](https://yarnpkg.com/) version 2 installed.
 3. Run `yarn link` or use npm, to link the package.
 
 Now, you can install the package using `yarn add @vws/core` or `npm install @vws/core`. Later, to unlink the package use `yarn unlink` in the core package.
+
+## Usage
+
+First off you need to initialize (signin) a new core. Then you can you any method provided by the extenders, the names _should_ be self explanatory.
+
+```typescript
+import core from '@vws/core'
+await core.init()
+
+// Functionallity provided by extender news.
+const news = core.getNews()
+
+// Functionallity provided by extender news.
+const feed = core.geedFeed()
+```
 
 ## Contributing
 
