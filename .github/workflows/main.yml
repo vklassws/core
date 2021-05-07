@@ -30,7 +30,7 @@ jobs:
 
       - run: yarn install
       - run: yarn build
-      - run: yarn test
+      - run: yarn test --timeout 7000
         env:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
