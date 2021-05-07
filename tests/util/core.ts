@@ -12,10 +12,10 @@ try {
 			username: process.env.username
 		}
 	} else if (err?.code === 'ENOENT') {
-		throw new Error('Credentials is missing. Use env or /account.json.')
+		throw new Error('Credentials is missing. Use env or "/account.json.".')
+	} else {
+		throw err
 	}
-
-	throw err
 }
 
 if (!credentials.username) {
