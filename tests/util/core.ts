@@ -26,11 +26,6 @@ if (!credentials.password) {
 	throw new Error('Password is missing.')
 }
 
-const core = new Core(credentials, {
-	// Set to true to see confidential information in exceptions. History _will_ include
-	// confidential information. Some confidential information may still be included even
-	// if set to true. Always check history before sharing! Do not commit set to false.
-	historyHideConfidential: false
-})
+const core = new Core(credentials)
 
 export default core
