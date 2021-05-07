@@ -1,0 +1,4 @@
+/build
+/node_modules
+/account.json
+/*.tsconfig.json

@@ -1,0 +1,47 @@
+{
+	"name": "@vws/core",
+	"version": "0.1.0",
+	"license": "MIT",
+	"main": "build/index.js",
+	"types": "build/index.d.ts",
+	"engines": {
+		"node": ">=14"
+	},
+	"scripts": {
+		"build": "gulp build",
+		"test": "gulp build.fast && mocha -r source-map-support/register build/tests/*.spec.js",
+		"lint": "eslint **/*.ts **/*.js"
+	},
+	"dependencies": {
+		"@esbuild-plugins/node-resolve": "^0.1.4",
+		"@esbuild-plugins/tsconfig-paths": "^0.0.4",
+		"@types/set-cookie-parser": "^2.4.0",
+		"@types/superagent": "^4.1.11",
+		"cheerio": "^1.0.0-rc.9",
+		"cookie": "^0.4.1",
+		"formdata-node": "^3.2.0",
+		"gulp": "^4.0.2",
+		"gulp-esbuild": "^0.7.6",
+		"gulp-typescript": "^6.0.0-alpha.1",
+		"lodash": "^4.17.21",
+		"set-cookie-parser": "^2.4.8",
+		"source-map-support": "^0.5.19",
+		"superagent": "^6.1.0"
+	},
+	"devDependencies": {
+		"@types/cookie": "^0.4.0",
+		"@types/lodash": "^4.14.168",
+		"@types/mocha": "^8.2.2",
+		"@types/node": "^15.0.2",
+		"@typescript-eslint/eslint-plugin": "^4.22.1",
+		"@typescript-eslint/parser": "^4.22.1",
+		"esbuild": "^0.11.19",
+		"eslint": "^7.25.0",
+		"mocha": "^8.3.2",
+		"typescript": "^4.2.4"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/vklassws/core"
+	}
+}

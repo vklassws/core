@@ -1,0 +1,30 @@
+name: Main Workflow
+
+on:
+  schedule:
+    - cron: "* */1 * * *"
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    env:
+      username: ${{ secrets.username }}
+      password: ${{ secrets.password }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: borales/actions-yarn@v2.3.0
+
+      - run: yarn install
+      - run: yarn build
+      - run: yarn test
+      - run: yarn lint

@@ -1,0 +1,36 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"target": "ES6",
+		"lib": [ "ES6" ],
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"baseUrl": ".",
+		"paths": {
+			"@/*": [
+				"src/*"
+			],
+			"@": [
+				"src"
+			],
+			"~/*": [
+				"./*"
+			],
+			"~": [
+				"."
+			]
+		}
+	},
+	"include": [
+		"src",
+		"tests",
+		"types"
+	],
+	"exclude": [
+		"build"
+	]
+}
