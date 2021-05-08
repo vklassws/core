@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-import Core from '@/core'
+import Core from '../core'
 import cheerio from 'cheerio'
-import { parseDateString } from '@/utils/format'
+import { parseDateString } from '../utils/format'
 
 export interface NewsAttachment {
 	name: string

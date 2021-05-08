@@ -1,5 +1,5 @@
 import assert from 'assert'
-import core from '~/tests/util/core'
+import core from './util/core'
 
 describe('feed', () => {
 	before(async () => {

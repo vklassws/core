@@ -34,7 +34,7 @@ export interface Schedule {
 	events: ScheduleEvent[]
 }
 
-type Core = typeof import('@/core').default
+type Core = typeof import('../core').default
 export default (Core: Core) => class ScheduleExtender extends Core {
 	async getSchedule(): Promise<Schedule> {
 		const { data } = await this.get(this.hosts.WWW + '/schema.aspx')

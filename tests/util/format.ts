@@ -1,4 +1,4 @@
-import { ChainHistory } from '@/index'
+import { ChainHistory } from '../index'
 
 const tab = (n: number) => '     '.repeat(n)
 

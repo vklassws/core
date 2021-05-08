@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 import cheerio from 'cheerio'
-import { parseDateString } from '@/utils/format'
+import { parseDateString } from '../utils/format'
 
 export interface Feed {
 	body: string
 	date: Date
 }
 
-type Core = typeof import('@/core').default
+type Core = typeof import('../core').default
 export default (Core: Core) => class FeedExtender extends Core {
 	async getFeed(): Promise<Feed[]> {
 		const { data } = await this.get(this.hosts.WWW + '/Latest.aspx')

@@ -1,11 +1,11 @@
-import Agent from '@/agent'
+import Agent from './agent'
 import CoreAuthenticator, { CoreAuthenticatorCredentials } from './authenticator'
 import classExtends from './utils/classExtends'
 
 // Extenders
-import feed from '@/extenders/feed'
-import news from '@/extenders/news'
-import schedule from '@/extenders/schedule'
+import feed from './extenders/feed'
+import news from './extenders/news'
+import schedule from './extenders/schedule'
 export const CoreExtenders = [feed, news, schedule]
 
 export interface Hosts {
