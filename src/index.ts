@@ -2,6 +2,7 @@
 // Export extender accessories and types here
 export * from '@/extenders/feed'
 export * from '@/extenders/news'
+export * from '@/extenders/schedule'
 
 // authenticator.ts
 export { CoreAuthenticatorCredentials as CoreCredentials } from '@/authenticator'
