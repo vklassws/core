@@ -30,7 +30,10 @@ module.exports = {
 			'rules': {
 				'indent': [
 					'error',
-					'tab'
+					'tab',
+					{
+						'SwitchCase': 1
+					}
 				],
 				'linebreak-style': [
 					'error',
@@ -43,6 +46,12 @@ module.exports = {
 				'semi': [
 					'error',
 					'never'
+				],
+				'no-empty': [
+					'warn',
+					{
+						'allowEmptyCatch': true
+					}
 				],
 				'@typescript-eslint/no-explicit-any': [
 					'off'

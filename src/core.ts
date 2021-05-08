@@ -5,7 +5,8 @@ import classExtends from './utils/classExtends'
 // Extenders
 import feed from '@/extenders/feed'
 import news from '@/extenders/news'
-export const CoreExtenders = [feed, news]
+import schedule from '@/extenders/schedule'
+export const CoreExtenders = [feed, news, schedule]
 
 export interface Hosts {
 	readonly AUTH: string
