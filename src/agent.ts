@@ -1,5 +1,5 @@
 import superagent from 'superagent'
-import decompress, { decompressEncodings, DecompressEncoding } from '@/utils/decompress'
+import decompress, { decompressEncodings, DecompressEncoding } from './utils/decompress'
 import { incasesensitivify } from './utils/incasesensitivify'
 
 export interface HistoryData {

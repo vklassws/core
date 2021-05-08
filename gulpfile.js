@@ -4,7 +4,8 @@ const ts = require('gulp-typescript')
 const { TsconfigPathsPlugin } = require('@esbuild-plugins/tsconfig-paths')
 const { NodeResolvePlugin } = require('@esbuild-plugins/node-resolve')
 
-const source_source = 'src/index.ts'
+const source_dir = 'src/'
+const source_source = source_dir + 'index.ts'
 const tests_source = ['tests/**/*.ts']
 
 const source_dest = {
@@ -56,7 +57,7 @@ gulp.task('source:build', () =>
 )
 
 gulp.task('source:declare', () =>
-	gulp.src(source_source)
+	gulp.src(source_dir + '**/*')
 		.pipe(project())
 		.dts.pipe(gulp.dest(source_dest.dir))
 )

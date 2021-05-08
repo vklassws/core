@@ -45,7 +45,7 @@ Read rules and guidelines in [contributing.md](https://github.com/vklassws/core/
 
 > **Note!** You will always be signed, so making requests to the main host is accepted by VKlass authentication service.
 
-To make a new extender place a file in `src/extenders` with the name describing the extender the best. The exports will not export themself. To add the extender exports to the entry, add . You will also need to make a [test specification](#testing-extenders) for the extender. Below is a simple example extracting the feed from "/Latest.aspx". Remember to add `export * from '@/extenders/your_extender'` to `index.ts` to export all exports from your extender. To extend the core with the extender you need to import and add the extender to the core.
+To make a new extender place a file in `src/extenders` with the name describing the extender the best. The exports will not export themself. To add the extender exports to the entry, add . You will also need to make a [test specification](#testing-extenders) for the extender. Below is a simple example extracting the feed from "/Latest.aspx". Remember to add `export * from './extenders/your_extender'` to `index.ts` to export all exports from your extender. To extend the core with the extender you need to import and add the extender to the core.
 
 ### Testing Extenders
 
