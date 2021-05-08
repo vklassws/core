@@ -1,4 +1,4 @@
-import { ChainHistory } from '@/index'
+import { ChainHistory } from '../index'
 
 function toTab(tab: string | number, indent: number) {
 	if (typeof tab === 'string')

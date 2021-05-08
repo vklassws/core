@@ -1,4 +1,4 @@
-import Core from '@/index'
+import _Core from '../../src/index'
 import fs from 'fs'
 
 let credentials: any
@@ -26,6 +26,6 @@ if (!credentials.password) {
 	throw new Error('Password is missing.')
 }
 
-const core = new Core(credentials)
+const core = new _Core(credentials)
 
 export default core
