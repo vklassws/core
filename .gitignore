@@ -2,3 +2,4 @@
 /node_modules
 /account.json
 /*.tsconfig.json
+/history.log

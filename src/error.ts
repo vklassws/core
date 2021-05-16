@@ -1,4 +1,4 @@
-export enum CoreErrorCode {
+export enum ErrorCode {
 	//#region HTTP STATUS CODES
 
 	/**
@@ -229,15 +229,31 @@ export enum CoreErrorCode {
 	NETWORK_AUTHENTICATION_REQUIRED = 511,
 
 	//#endregion
-	
+
 	UNKNOWN = -1,
+
+	PIPE_URL_DOES_NOT_MATCH = 1410,
+
+	INVALID_URL = 1510,
+
+	SHOULD_BE_RELATIVE = 1511,
 }
 
-export const CodeErrorMsg = {} as const
+const ErrorMessages = {
+	[ErrorCode.INVALID_URL]: (url: string) => `[CHAIN] The URL could not be parsed (${url})`,
+	[ErrorCode.SHOULD_BE_RELATIVE]: (url: string) => `[CHAIN] The URL is not relative to main host or contained the main host illegally (${url})`,
+	[ErrorCode.PIPE_URL_DOES_NOT_MATCH]: (url: string) => `[PIPE] The  (${url})`,
+} as const
 
-export default class CoreError extends Error {
+export class CoreError extends Error {
+	code: keyof ErrorCode
 
-	constructor(public code: CoreErrorCode, msg: string | undefined = (CodeErrorMsg as any)[code]) {
-		super(msg)
+	constructor(code: keyof Pick<keyof ErrorCode, keyof typeof ErrorMessages>, ...args: Parameters<typeof ErrorMessages[typeof code]>)
+	constructor(code: ErrorCode, message: string, ...args: any[])
+	constructor(code: any, ...args: any[]) {
+		super(((ErrorMessages as Record<number, (...args: any[]) => string>)[code])?.(...args) ?? args[0])
+		this.code = code as keyof ErrorCode
 	}
 }
+
+export default CoreError

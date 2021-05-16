@@ -1,0 +1,81 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"lessons": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"from": {
+						"type": "number"
+					},
+					"to": {
+						"type": "number"
+					},
+					"subject": {
+						"type": "string"
+					},
+					"subjectShort": {
+						"type": "string"
+					},
+					"teacherShort": {
+						"type": "string"
+					},
+					"canceled": {
+						"type": "boolean"
+					},
+					"information": {
+						"type": "string"
+					},
+					"where": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"exams": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"cid": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					},
+					"lesson": {
+						"type": "string"
+					},
+					"time": {
+						"type": "number"
+					},
+					"infoShort": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"events": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"time": {
+						"type": "number"
+					}
+				}
+			}
+		}
+	}
+}

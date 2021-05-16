@@ -1,0 +1,24 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "array",
+	"items": {
+		"type": "object",
+		"properties": {
+			"attachments": {
+				"type": "boolean"
+			},
+			"time": {
+				"type": "number"
+			},
+			"title": {
+				"type": "string"
+			},
+			"info": {
+				"type": "string"
+			},
+			"id": {
+				"type": "string"
+			}
+		}
+	}
+}
