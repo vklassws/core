@@ -100,12 +100,16 @@ export class Agent {
 	addHistory(history: AgentHistory): void {
 		this.history.push(history)
 
-		if (this._options.historyLog)
+		if (this.shouldLogHistory)
 			fs.appendFileSync(this.historyLogFilePath, formatHistory(4, [history]))
 	}
 
 	get historyLogFilePath(): string {
 		return typeof this._options.historyLog === 'string' ? this._options.historyLog : 'history.log'
+	}
+
+	get shouldLogHistory(): boolean {
+		return !!this._options.historyLog
 	}
 
 	constructor(
@@ -114,7 +118,8 @@ export class Agent {
 		public readonly mainHost: string,
 		public readonly _options: AgentConstructorOptions
 	) {
-		fs.appendFileSync(this.historyLogFilePath, `\n\n${'-'.repeat(26)} ${new Date().toISOString()} ${'-'.repeat(26)}\n\n`)
+		if (this.shouldLogHistory)
+			fs.appendFileSync(this.historyLogFilePath, `\n\n${'-'.repeat(26)} ${new Date().toISOString()} ${'-'.repeat(26)}\n\n`)
 	}
 
 	get(url: string, config?: ChainRequestConfig): Request {
