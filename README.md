@@ -1,6 +1,6 @@
 # VklassWS Core
 
-This package contains the accual web scraper and APIs. The package is not complete and will probaly never be. Much functionallity is not implemented yet. But _you_ can [contribute extenders](#contributing) to add functionallity ;)
+This package contains the accual web scraper and APIs. The package is not complete and will probaly never be. Much functionallity is not implemented yet. But _you_ can loaders to add functionallity ;)
 
 ## Installation
 
