@@ -8,7 +8,7 @@ describe('schedule', () => {
 	})
 
 	it('get schedule', async () => {
-		const schedule = await core.pipe(core.loaders.schedule.getSchedule())
+		const schedule = await core.pipe(core.loaders.schedule.schedule())
 		if (!validator.validate(scheduleValid, schedule))
 			throw validator.errors
 	})

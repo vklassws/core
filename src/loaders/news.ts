@@ -2,13 +2,13 @@ import cheerio from 'cheerio'
 import { parseDateString } from '../utils/format'
 import { Pipe } from '../pipeline'
 
-export interface NewsAttachment {
+export interface Attachment {
 	name: string
 	url: string
 }
 
-export interface NewsDetails {
-	attachments: NewsAttachment[]
+export interface Details {
+	attachments: Attachment[]
 	from: number
 	to: number
 	authorName: string
@@ -25,12 +25,12 @@ export interface News {
 	id: string
 }
 
-export function getNewsDetails(id: string) {
-	return async function (pipe: Pipe): Promise<NewsDetails> {
+export function details(id: string) {
+	return async function (pipe: Pipe): Promise<Details> {
 		const { data } = await pipe.request(`/News/NewsDetails.aspx?id=${id}`, '/News/NewsDetails.aspx')
 		const $ = cheerio.load(data)
 
-		const attachments = $('.NewsAttachment ul li a[href]').toArray().map<NewsAttachment>(element => {
+		const attachments = $('.NewsAttachment ul li a[href]').toArray().map<Attachment>(element => {
 			const el = $(element)
 
 			return {
@@ -62,7 +62,7 @@ export function getNewsDetails(id: string) {
 }
 
 
-export function getNews() {
+export function news() {
 	return async function (pipe: Pipe): Promise<News[]> {
 		const { data } = await pipe.request('/default.aspx', '/default.aspx')
 		const $ = cheerio.load(data)

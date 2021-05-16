@@ -33,7 +33,7 @@ export interface Schedule {
 	events: ScheduleEvent[]
 }
 
-export function getSchedule() {
+export function schedule() {
 	return async function (pipe: Pipe): Promise<Schedule> {
 		const { data } = await pipe.request('/schema.aspx', '/schema.aspx')
 		const $ = cheerio.load(data)

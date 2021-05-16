@@ -6,7 +6,7 @@ describe('feed', () => {
 	before(core.before)
 
 	it('list feed', async () => {
-		const feeds = await core.pipe(core.loaders.feed.getFeeds())
+		const feeds = await core.pipe(core.loaders.feed.feeds())
 		if (!validator.validate(feedsValid, feeds))
 			throw validator.errors
 	})

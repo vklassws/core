@@ -7,7 +7,7 @@ export interface Feed {
 	time: number
 }
 
-export function getFeeds() {
+export function feeds() {
 	return async function (pipe: Pipe): Promise<Feed[]> {
 		const { data } = await pipe.request('/Latest.aspx', '/Latest.aspx')
 		const $ = cheerio.load(data)

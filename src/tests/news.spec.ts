@@ -12,7 +12,7 @@ describe('news', () => {
 	})
 
 	it('list news', async () => {
-		const news = await core.pipe(core.loaders.news.getNews())
+		const news = await core.pipe(core.loaders.news.news())
 		if (!validator.validate(newsValid, news))
 			throw validator.errors
 		newsId = news[0]?.id
@@ -20,7 +20,7 @@ describe('news', () => {
 
 	it('list details', async () => {
 		assert(!!newsId)
-		const details = await core.pipe(core.loaders.news.getNewsDetails(newsId))
+		const details = await core.pipe(core.loaders.news.details(newsId))
 		if (!validator.validate(detailsValid, details))
 			throw validator.errors
 	})
