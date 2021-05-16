@@ -24,14 +24,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install yarn
-        if: ${{ github.token || false }}
-        run: npm i -g yarn
 
-      - run: yarn install
-      - run: yarn build
-      - run: yarn test --timeout 7000
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
         env:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-      - run: yarn lint
+      - run: npm run lint
