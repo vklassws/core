@@ -1,7 +1,7 @@
-import _Core from '../../src/index'
+import Core, { Credentials } from '../..'
 import fs from 'fs'
 
-let credentials: any
+let credentials: Credentials
 
 try {
 	credentials = JSON.parse(fs.readFileSync('account.json', 'utf-8'))
@@ -26,6 +26,12 @@ if (!credentials.password) {
 	throw new Error('Password is missing.')
 }
 
-const core = new _Core(credentials)
+class TestCore extends Core {
+	before = async () => {
+		await this.authenticate(credentials)
+	}
+}
 
-export default core
+export default new TestCore({
+	historyLog: true
+})

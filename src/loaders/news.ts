@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
-import Core from '../core'
 import cheerio from 'cheerio'
 import { parseDateString } from '../utils/format'
+import { Pipe } from '../pipeline'
 
 export interface NewsAttachment {
 	name: string
@@ -11,8 +9,8 @@ export interface NewsAttachment {
 
 export interface NewsDetails {
 	attachments: NewsAttachment[]
-	date: Date
-	dateSpan: [Date, Date]
+	from: number
+	to: number
 	authorName: string
 	authorId: string
 	roles: string[]
@@ -21,17 +19,15 @@ export interface NewsDetails {
 
 export interface News {
 	attachments: boolean
-	date: Date
+	time: number
 	title: string
 	info: string
 	id: string
 }
 
-export default (C: typeof Core) => class NewsExtender extends C {
-	/** Get news details */
-	async getNewsDetails(id: string): Promise<NewsDetails | undefined> {
-		const { data } = await this.get(this.hosts.WWW + `/News/NewsDetails.aspx?id=${id}`)
-
+export function getNewsDetails(id: string) {
+	return async function (pipe: Pipe): Promise<NewsDetails> {
+		const { data } = await pipe.request(`/News/NewsDetails.aspx?id=${id}`, '/News/NewsDetails.aspx')
 		const $ = cheerio.load(data)
 
 		const attachments = $('.NewsAttachment ul li a[href]').toArray().map<NewsAttachment>(element => {
@@ -49,39 +45,40 @@ export default (C: typeof Core) => class NewsExtender extends C {
 
 		const roles = $('#ctl00_ContentPlaceHolder2_ShowForRoles').text().split(', ')
 
-		const [startDate, endDate] = $('#ctl00_ContentPlaceHolder2_VisibilityLabel').text().split(' till ').map(d => parseDateString('short', d))
-		const dateSpan: [Date, Date] = [startDate, endDate]
-		const date = dateSpan[0]
+		const [from, to] = $('#ctl00_ContentPlaceHolder2_VisibilityLabel').text().split(' till ').map(d => parseDateString('short', d).getTime())
 
-		const title = $('.metainfo').text()
+		const title = $('.metainfo').text().slice(0, -2)
 
 		return {
 			attachments,
 			authorId,
 			authorName,
-			date,
 			roles,
-			dateSpan,
-			title
+			title,
+			from,
+			to
 		}
 	}
+}
 
-	/** Get all news, date ascending */
-	async getNews(): Promise<News[]> {
-		const { data } = await this.get(this.hosts.WWW + '/default.aspx')
 
+export function getNews() {
+	return async function (pipe: Pipe): Promise<News[]> {
+		const { data } = await pipe.request('/default.aspx', '/default.aspx')
 		const $ = cheerio.load(data)
 
-		return $('.newsPost').toArray().map<News>(element => {
+		const news = $('.newsPost').toArray().map<News>(element => {
 			const header = $('.newsPostLink', element)
 
 			return {
 				attachments: !header.first().hasClass('newsDate'),
-				date: parseDateString('long', $('.newsDate', header).text()),
+				time: parseDateString('long', $('.newsDate', header).text()).getTime(),
 				id: /id=([^&]+)(?:&|^)/.exec(header.attr('href') as string)?.[1] as string,
 				info: $('.newsInfo', element).text(),
 				title: $('h3', header).nextAll().text()
 			}
-		}).sort((a, b) => b.date.getTime() - a.date.getTime())
+		}).sort((a, b) => b.time - a.time)
+
+		return news
 	}
 }

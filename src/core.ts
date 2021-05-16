@@ -1,34 +1,18 @@
 import Agent from './agent'
-import CoreAuthenticator, { CoreAuthenticatorCredentials } from './authenticator'
-import classExtends from './utils/classExtends'
+import { Credentials } from './loaders/auth'
+import * as loaders from './__loaders'
+import { PipeFn, Pipeline, PipePipe } from './pipeline'
 
-// Extenders
-import feed from './extenders/feed'
-import news from './extenders/news'
-import schedule from './extenders/schedule'
-export const CoreExtenders = [feed, news, schedule]
-
-export interface Hosts {
-	readonly AUTH: string
-	readonly WWW: string
-}
-
-export interface CoreOptions {
-	/**
-	 * Hosts to make requests through.
-	 * @default Core.HOSTS
-	 */
-	hosts?: Hosts
-
+export interface Options {
 	/**
 	 * Request headers.
-	 * @default Core.HEADERS
+	 * @default Core.requestHeaders
 	 */
 	headers?: any
-	
+
 	/**
 	 * Request and response buffer encoding.
-	 * @default Core.DEFAULT_ENCODING
+	 * @default 'utf-8'
 	 */
 	encoding?: BufferEncoding
 
@@ -37,16 +21,12 @@ export interface CoreOptions {
 	 * @default true
 	 */
 	historyHideConfidential?: boolean
+
+	historyLog?: boolean | string
 }
 
-@classExtends(CoreExtenders)
-export default class Core extends Agent {
-	public static readonly DEFAULT_ENCODING: BufferEncoding = 'utf-8'
-	public static readonly HOSTS: Hosts = {
-		AUTH: 'https://auth.vklass.se',
-		WWW: 'https://www.vklass.se'
-	}
-	public static readonly HEADERS: any = {
+export class Core {
+	static readonly requestHeaders = {
 		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', // HTML, XHMTL+XML
 		'Accept-Encoding': 'gzip, deflate, br',
 		'Accept-Language': 'en-US,en;q=0.5', // English US
@@ -58,25 +38,39 @@ export default class Core extends Agent {
 		'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36' // Chrome 90
 	}
 
-	public readonly encoding: BufferEncoding
-	public readonly hosts: Hosts
-	public readonly headers: any
+	readonly encoding: BufferEncoding
+	readonly headers: any
+	readonly mainHost: string
+	readonly agent: Agent
 
-	public init: CoreAuthenticator['init']
+	get loaders(): typeof loaders {
+		return loaders
+	}
 
-	constructor(
-		credentials: CoreAuthenticatorCredentials,
-		options?: CoreOptions
-	) {
-		super(options?.headers ?? Core.HEADERS, options?.encoding ?? Core.DEFAULT_ENCODING, {
-			historyHideConfidential: options?.historyHideConfidential
+	pipeline(): Pipeline {
+		return new Pipeline(this.agent)
+	}
+
+	pipe<Fn extends PipeFn>(fn: Fn): PipePipe<Fn> {
+		const pipeline = this.pipeline()
+		return pipeline.pipe(fn)
+	}
+
+	/**
+	 * Shorthand for `this.loaders.auth.authenticate`
+	 */
+	async authenticate(credentials: Credentials): Promise<void> {
+		await this.pipe(loaders.auth.authenticate(credentials))
+	}
+
+	constructor(options?: Options) {
+		this.encoding = options?.encoding ?? 'utf-8'
+		this.headers = options?.headers ?? Core.requestHeaders
+		this.mainHost = 'https://www.vklass.se'
+
+		this.agent = new Agent(this.headers, this.encoding, this.mainHost, {
+			historyHideConfidential: options?.historyHideConfidential ?? true,
+			historyLog: options?.historyLog
 		})
-
-		this.encoding = options?.encoding ?? Core.DEFAULT_ENCODING
-		this.hosts = options?.hosts ?? Core.HOSTS
-		this.headers = options?.headers ?? Core.HEADERS
-
-		const authenticator = new CoreAuthenticator(this, credentials)
-		this.init = () => authenticator.init()
 	}
 }

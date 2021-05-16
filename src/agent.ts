@@ -1,6 +1,9 @@
 import superagent from 'superagent'
+import CoreError, { ErrorCode } from './error'
 import decompress, { decompressEncodings, DecompressEncoding } from './utils/decompress'
 import { incasesensitivify } from './utils/incasesensitivify'
+import fs from 'fs'
+import formatHistory from './utils/formatHistory'
 
 export interface HistoryData {
 	url: string
@@ -8,7 +11,7 @@ export interface HistoryData {
 	headers: any
 }
 
-export interface History {
+export interface AgentHistory {
 	method: string
 	confidential: boolean
 	response?: HistoryData
@@ -16,8 +19,9 @@ export interface History {
 	status?: number
 }
 
-export interface AgentOptions {
+export interface AgentConstructorOptions {
 	historyHideConfidential?: boolean
+	historyLog?: boolean | string
 }
 
 export interface Headers {
@@ -58,7 +62,7 @@ export interface RequestConfig {
 	redirects?: number
 }
 
-export interface AgentRequestConfig extends RequestConfig {
+export interface ChainRequestConfig extends RequestConfig {
 	/**
 	 * If request contains confidential information.
 	 * If set to true the request data & headers will not appear in history.
@@ -89,54 +93,68 @@ export interface Response extends superagent.Response {
 
 export interface Request extends Omit<superagent.Request, keyof Promise<unknown>>, Promise<Response> { }
 
-export default class Agent {
+export class Agent {
 	_agent = superagent.agent()
-	history: History[] = []
+	history: AgentHistory[] = []
+
+	addHistory(history: AgentHistory): void {
+		this.history.push(history)
+
+		if (this._options.historyLog)
+			fs.appendFileSync(this.historyLogFilePath, formatHistory(4, [history]))
+	}
+
+	get historyLogFilePath(): string {
+		return typeof this._options.historyLog === 'string' ? this._options.historyLog : 'history.log'
+	}
 
 	constructor(
 		public readonly headers: any,
 		public readonly encoding: BufferEncoding,
-		public readonly _options: AgentOptions
-	) { }
+		public readonly mainHost: string,
+		public readonly _options: AgentConstructorOptions
+	) {
+		fs.appendFileSync(this.historyLogFilePath, `\n\n${'-'.repeat(26)} ${new Date().toISOString()} ${'-'.repeat(26)}\n\n`)
+	}
 
-	get(url: string, config?: AgentRequestConfig): Promise<Request> {
+	get(url: string, config?: ChainRequestConfig): Request {
 		return this.request('get', url, config)
 	}
 
-	delete(url: string, config?: AgentRequestConfig): Promise<Request> {
+	delete(url: string, config?: ChainRequestConfig): Request {
 		return this.request('delete', url, config)
 	}
 
-	head(url: string, config?: AgentRequestConfig): Promise<Request> {
+	head(url: string, config?: ChainRequestConfig): Request {
 		return this.request('head', url, config)
 	}
 
-	options(url: string, config?: AgentRequestConfig): Promise<Request> {
+	options(url: string, config?: ChainRequestConfig): Request {
 		return this.request('options', url, config)
 	}
 
-	post(url: string, data?: any, config?: AgentRequestConfig): Promise<Request> {
+	post(url: string, data?: any, config?: ChainRequestConfig): Request {
 		config = config ?? {}
 		if (data !== undefined && data !== null)
 			config.data = data
 		return this.request('post', url, config)
 	}
 
-	put(url: string, data?: any, config?: AgentRequestConfig): Promise<Request> {
+	put(url: string, data?: any, config?: ChainRequestConfig): Request {
 		config = config ?? {}
 		if (data !== undefined && data !== null)
 			config.data = data
 		return this.request('put', url, config)
 	}
 
-	patch(url: string, data?: any, config?: AgentRequestConfig): Promise<Request> {
+	patch(url: string, data?: any, config?: ChainRequestConfig): Request {
 		config = config ?? {}
 		if (data !== undefined && data !== null)
 			config.data = data
 		return this.request('patch', url, config)
 	}
 
-	async request(method: 'get' | 'delete' | 'head' | 'options' | 'post' | 'put' | 'patch', url: string, config: AgentRequestConfig | undefined): Promise<Request> {
+	request(method: 'get' | 'delete' | 'head' | 'options' | 'post' | 'put' | 'patch', url: string, config: ChainRequestConfig | undefined): Request {
 		const headers: Headers = {
 			...{
 
@@ -145,6 +163,26 @@ export default class Agent {
 			...(config?.headers ?? {})
 		}
 		const queries: Queries = config?.queries ?? {}
+
+		if (url.startsWith('/')) {
+			url = this.mainHost.replace(/\/$|$/, '') + url
+		} else {
+			let parsedUrl: URL
+
+			try {
+				parsedUrl = new URL(url)
+			} catch (err) {
+				if (typeof err === 'object' && typeof err.code === 'string' && err.code.endsWith('_INVALID_URL')) {
+					throw new CoreError(ErrorCode.INVALID_URL, url)
+				}
+
+				throw err
+			}
+
+			if (parsedUrl.host === this.mainHost) {
+				throw new CoreError(ErrorCode.SHOULD_BE_RELATIVE, url)
+			}
+		}
 
 		const req = this._agent[method](url) as unknown as Request
 
@@ -162,7 +200,6 @@ export default class Agent {
 			})
 		})
 
-		// Headers
 		for (const key in headers) {
 			if (Object.prototype.hasOwnProperty.call(headers, key)) {
 				const header = headers[key]
@@ -170,21 +207,15 @@ export default class Agent {
 			}
 		}
 
-		// Queries
 		req.query(queries)
-
-		// Redirects
 		req.redirects(config?.redirects ?? 10)
-
-		// Retry
 		req.retry(config?.retries ?? 1)
 
-		// Body
 		if (config?.data !== undefined && config?.data !== null)
 			req.send(config.data)
 
-		const toHistory = (res: Response | undefined): History => {
-			const history: History = {
+		const toHistory = (res: Response | undefined): AgentHistory => {
+			const history: AgentHistory = {
 				confidential: config?.confidential === true && this._options.historyHideConfidential !== false,
 				method: method,
 				request: {
@@ -209,7 +240,7 @@ export default class Agent {
 
 		const toResponse = async (res: superagent.Response & Partial<Response>) => {
 			res.headersLow = incasesensitivify(res.headers)
-			res.encoding = res.headersLow['content-encoding']
+			res.encoding = (res.headersLow as Headers)['content-encoding']
 			const isSupportedEncoding = decompressEncodings.includes(res.encoding)
 			if (isSupportedEncoding)
 				res.body = await decompress(res.body, res.encoding as DecompressEncoding) ?? res.body
@@ -217,17 +248,35 @@ export default class Agent {
 				res.body = Buffer.isBuffer(res.body) ? res.body : Buffer.from(res.body)
 			const isBufferEncoding = ['ascii', 'utf8', 'utf-8', 'utf16le', 'ucs2', 'ucs-2', 'base64', 'base64url', 'latin1', 'binary', 'hex'].includes(res.charset)
 			res.data = res.body.toString(isBufferEncoding ? res.charset as BufferEncoding : undefined)
+			return res as Response
 		}
 
-		return req.then(async res => {
-			await toResponse(res)
-			this.history.push(toHistory(res))
-			return res
-		}).catch(async err => {
-			await toResponse(err.response)
-			this.history.push(toHistory(err.response))
-			err.history = this.history
-			return err
-		})
+		const promise = new Promise<Response>((resolve, reject) => {
+			req.then(res => {
+				toResponse(res).then(res => {
+					this.addHistory(toHistory(res))
+					resolve(res)
+				})
+			}).catch(async err => {
+				err.response = await toResponse(err.response)
+				this.addHistory(toHistory(err.response))
+				err.history = this.history
+				reject(err)
+			})
+		}) as Request
+
+		for (const _key in req) {
+			const key = _key as keyof typeof req
+			if (Object.prototype.hasOwnProperty.call(req, key)) {
+				const value = req[key]
+				if (!['then', 'catch', 'finally'].includes(key)) {
+					promise[key] = value as any
+				}
+			}
+		}
+
+		return promise
 	}
 }
+
+export default Agent

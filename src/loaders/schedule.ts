@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import cheerio from 'cheerio'
+import { Pipe } from '../pipeline'
 
 export interface ScheduleLesson {
-	from: Date
-	to: Date
+	from: number
+	to: number
 	subject: string
 	subjectShort: string
 	teacherShort: string
@@ -18,14 +17,14 @@ export interface ScheduleExam {
 	cid: string
 	type: string
 	lesson: string
-	date: Date
+	time: number
 	infoShort: string
 	title: string
 }
 
 export interface ScheduleEvent {
 	name: string
-	date: Date
+	time: number
 }
 
 export interface Schedule {
@@ -34,10 +33,9 @@ export interface Schedule {
 	events: ScheduleEvent[]
 }
 
-type Core = typeof import('../core').default
-export default (Core: Core) => class ScheduleExtender extends Core {
-	async getSchedule(): Promise<Schedule> {
-		const { data } = await this.get(this.hosts.WWW + '/schema.aspx')
+export function getSchedule() {
+	return async function (pipe: Pipe): Promise<Schedule> {
+		const { data } = await pipe.request('/schema.aspx', '/schema.aspx')
 		const $ = cheerio.load(data)
 
 		const [syear, smonth, sdate] = Array.from(/(2[0-9]{3,3})-([0-9]{2,2})-([0-9]{2,2}) -/.exec($('#DatePeriod').text()) ?? []).slice(1).map(n => parseInt(n))
@@ -67,8 +65,8 @@ export default (Core: Core) => class ScheduleExtender extends Core {
 					information = lines.slice(4).join('\n')
 				}
 
-				const from = new Date(syear, smonth, sdate + i, parseInt(sh), parseInt(sm))
-				const to = new Date(syear, smonth, sdate + i, parseInt(eh), parseInt(em))
+				const from = new Date(syear, smonth, sdate + i, parseInt(sh), parseInt(sm)).getTime()
+				const to = new Date(syear, smonth, sdate + i, parseInt(eh), parseInt(em)).getTime()
 
 				return {
 					canceled,
@@ -121,17 +119,17 @@ export default (Core: Core) => class ScheduleExtender extends Core {
 				const infoShort = lines.slice(2).join('\n').trim()
 				const [h, m] = Array.from(/([0-9]{2,2}):([0-9]{2,2})/.exec(timeString) ?? []).slice(1)
 
-				const date = new Date(
+				const time = new Date(
 					syear,
 					smonth,
 					sdate + i,
 					parseInt(h),
 					parseInt(m)
-				)
+				).getTime()
 
 				return {
 					title,
-					date,
+					time,
 					infoShort,
 					cid,
 					id,
@@ -148,17 +146,17 @@ export default (Core: Core) => class ScheduleExtender extends Core {
 			try {
 				/* eslint-disable @typescript-eslint/no-non-null-assertion */
 				if (/background-color\s*:\s*rgba\(\s*255\s*,\s*0\s*,\s*0\s*,\s*0\s*\.\s*5\)/i.test((element.parent()!.parent() as any).attr().style)) {
-					const date = new Date(
+					const time = new Date(
 						syear,
 						smonth,
 						sdate + i
-					)
+					).getTime()
 
 					const name = $(element.parent()!).attr().title
 
 					return {
-						date: date,
-						name: name
+						time,
+						name
 					}
 				}
 				/* eslint-enable */
