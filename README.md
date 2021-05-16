@@ -1,11 +1,13 @@
-# VklassWS Core
+<h1 align="center"><img src="https://raw.githubusercontent.com/vklassws/meta/main/banners/core.svg" alt="VWS Core - ASPX Webscraper APIs"></h1>
 
-This package contains the accual web scraper and APIs. The package is not complete and will probaly never be. Much functionallity is not implemented yet. But _you_ can loaders to add functionallity ;)
+VWS Core is the core of the VWS project. It is essentially a HTTP [request agent](https://visionmedia.github.io/superagent/) simulating the actions done by a user. The built-in loaders can parse and extract data from VKlass' ASPX pages using the request pipeline. All requests are sent over encrypted https and the request headers are indistinguishable to a normal user, so there is no telling you're webscraping on their side.
 
-## Installation
+## Security
 
-1. Clone this repository
-2. Run `npm ci` and `npm run build`
-3. Run `npm link` or use npm, to link the package.
+### Vulnerability report
 
-Now, you can install the package using `npm i @vws/core` or `npm i @vws/core`. Later, to unlink the package use `npm unlink` in the core package.
+We take the security of our services and applications as well as users seriously, but we do not take any responisibility regarding security vulnerabilities in VKlass itself. If you have a suspected security vulnerability in any of _our_ services, _refrain_ from posting it anywhere publicly and report it directory to elias.skogevall@gmail.com.
+
+### History Log
+
+The history log may contain active sessions or tokens that ban be used to access your account. To prevent this, consider not using the history log at all. But if required, ensure not publicly posting your history log before the session has permanently run out.
