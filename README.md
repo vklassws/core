@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://raw.githubusercontent.com/vklassws/meta/main/banners/core.svg" alt="VWS Core - ASPX Webscraper APIs"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/vklassws/meta/main/static/banners/dist/core.svg" alt="VWS Core - ASPX Webscraper APIs"></h1>
 
 VWS Core is the core of the VWS project. It is essentially a HTTP [request agent](https://visionmedia.github.io/superagent/) simulating the actions done by a user. The built-in loaders can parse and extract data from VKlass' ASPX pages using the request pipeline. All requests are sent over encrypted https and the request headers are indistinguishable to a normal user, so there is no telling you're webscraping on their side.
 
